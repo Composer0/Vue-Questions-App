@@ -1,92 +1,129 @@
 <template>
   <div class="ctr">
-    <div class="questions-ctr">
-        <div class="progress">
-            <div class="bar"></div>
-            <div class="status">1 out of 3 questions answered</div>
-        </div>
-        <div class="single-question">
-            <div class="question">Sample Question 1</div>
-            <div class="answers">
-                <div class="answer">Sample Answer 1</div>
-                <div class="answer">Sample Answer 2</div>
-                <div class="answer">Sample Answer 3</div>
-                <div class="answer">Sample Answer 4</div>
-            </div>
-        </div>
+    <div class="progress">
+      <div 
+        class="bar" 
+        :style="{ width: `${ (questionsAnswered / questions.length) * 100}%` }"></div>
+      <div class="status">
+        {{ questionsAnswered }} out of {{ questions.length }} questions answered</div>
     </div>
-    <div class="result">
-        <div class="title">You got sample result 1!</div>
-        <div class="desc">
-            Enter a short description here about the result.
-        </div>
-    </div>
-    <button type="button" class="reset-btn">Reset</button>
+    <transition name="fade" mode="out-in">
+      <Questions
+        v-if="questionsAnswered < questions.length"
+        :questions="questions"
+        :questionsAnswered="questionsAnswered"
+        @question-answered="questionAnswered"
+      />
+  
+      <Results 
+      v-else
+      :results="results" 
+      :totalCorrect="totalCorrect"
+      />
+  </transition>
+  
+    <button 
+    type="button" 
+    class="reset-btn" 
+    @click.prevent="reset" 
+    v-if="this.questionsAnswered === questions.length"
+  >
+    Reset
+  </button>
+  <a 
+    class="reset-btn"
+    v-if="questionsAnswered === questions.length && totalCorrect >= 3"
+    href="https://www.orionpalmer.com"
+    target="_blank"
+  >
+    Return to Portfolio
+  </a>
+  <a 
+    class="reset-btn"
+    v-if="questionsAnswered === questions.length && totalCorrect < 3"
+    href="https://studentprivacy.ed.gov/sites/default/files/resource_document/file/A%20parent%20guide%20to%20ferpa_508.pdf#:~:text=Under%20FERPA%2C%20a%20parent%20has%20the%20right%20to,in%20violation%20of%20the%20child%E2%80%99s%20rights%20of%20privacy."
+    target="_blank"
+  >
+    FERPA Handbook
+  </a>
   </div>
 </template>
 
-<script >
+<script>
+
+import Questions from './components/Questions.vue';
+import Results from './components/Results.vue';
 export default {
   name: 'App',
+  components: {
+    Questions,
+    Results
+  },
   data() {
     return {
+      questionsAnswered: 0,
+      totalCorrect: 0,
       questions: [
           {
-              q: 'What is 2 + 2?', 
+              q: 'Which piece of federal legislation protects confidentiality of student records?', 
               answers: [
                   {
-                      text: '4',
-                      is_correct: true
+                    text: 'McKinney-Vento',
+                    is_correct: false
                   },
                   {
-                      text: '3',
-                      is_correct: false 
+                    text: 'Individuals with Disabilities Education Act (IDEA)',
+                    is_correct: false 
                   },
                   {
-                      text: 'Fish',
-                      is_correct: false 
+                    text: 'Section 504 of the Rehabilitation Act',
+                    is_correct: false 
                   },
                   {
-                      text: '5',
-                      is_correct: false 
+                    text: 'Family Educational Rights and Privacy Acto of 1974 (FERPA)',
+                    is_correct: true 
                   }
               ] 
           },
           { 
-              q: 'How many letters are in the word "Banana"?', 
+              q: 'Which of the following information from school records may be shared without obtaining written permission?', 
               answers: [
                   {
-                      text: '5',
-                      is_correct: false
+                    text: 'birthday',
+                    is_correct: true
                   },
                   {
-                      text: '7',
-                      is_correct: false 
+                    text: 'grades',
+                    is_correct: false 
                   },
                   {
-                      text: '6',
-                      is_correct: true 
+                    text: 'test scores',
+                    is_correct: false 
                   },
                   {
-                      text: '12',
-                      is_correct: false 
+                    text: 'placement in special services',
+                    is_correct: false 
                   }
               ] 
           },
           { 
-              q: 'Find the missing letter: C_ke', 
+              q: "If a parent believes that information in their minor child's school records is inaccurate, which of the following options is available?", 
               answers: [
                   {
-                      text: 'e',
-                      is_correct: false
+                    text: "The parent may seek an amendment or correction of their child's education records.",
+                    is_correct: true
                   },
                   {
-                      text: 'a',
-                      is_correct: true 
+                    text: 'The parent does not have any rights to access student records.',
+                    is_correct: false 
                   },
                   {
-                      text: 'i',
-                      is_correct: false 
+                    text: "Parents may remove portions of the student's record.",
+                    is_correct: false 
+                  },
+                  {
+                    text: "Schools must change the disputed information.",
+                    is_correct: false
                   }
               ] 
           },
@@ -96,150 +133,34 @@ export default {
               min: 0,
               max: 2,
               title: "Try again!",
-              desc: "Do a little more studying and you may succeed!"
+              desc: "Please review the FERPA Handbook for review and please try again."
           },
           {
               min: 3,
               max: 3,
-              title: "Wow, you're a genius!",
-              desc: "Studying has definitely paid off for you!"
+              title: "Congratulations!",
+              desc: "Congratulations you have passed the FERPA quiz!"
           }
       ]
+    }
+  },
+  methods: {
+    questionAnswered(is_correct) {
+      if(is_correct) {
+        this.totalCorrect++;
+      }
+
+      this.questionsAnswered++
+    },
+    reset() {
+      this.questionsAnswered = 0;
+      this.totalCorrect = 0;
     }
   }
 }
 </script>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-body {
-  font-size: 20px;
-  font-family: sans-serif;
-  padding-top: 20px;
-  background: #e6ecf1;
-}
 
-.ctr {
-  margin: 0 auto;
-  max-width: 600px;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-}
-.questions-ctr {
-  position: relative;
-  width: 100%;
-}
-.question {
-  width: 100%;
-  padding: 20px;
-  font-size: 32px;
-  font-weight: bold;
-  text-align: center;
-  background-color: #00ca8c;
-  color: #fff;
-  box-sizing: border-box;
-}
-.single-question {
-  position: relative;
-  width: 100%;
-}
-.answer {
-  border: 1px solid #8e959f;
-  padding: 20px;
-  font-size: 18px;
-  width: 100%;
-  background-color: #fff;
-  transition: 0.2s linear all;
-}
-.answer span {
-  display: inline-block;
-  margin-left: 5px;
-  font-size: 0.75em;
-  font-style: italic;
-}
-.progress {
-  height: 50px;
-  margin-top: 10px;
-  background-color: #ddd;
-  position: relative;
-}
-.bar {
-  height: 50px;
-  background-color: #ff6372;
-  transition: all 0.3s linear;
-}
-.status {
-  position: absolute;
-  top: 15px;
-  left: 0;
-  text-align: center;
-  color: #fff;
-  width: 100%;
-}
-.answer:not(.is-answered) {
-  cursor: pointer;
-}
-.answer:not(.is-answered):hover {
-  background-color: #8ce200;
-  border-color: #8ce200;
-  color: #fff;
-}
-
-.title {
-  width: 100%;
-  padding: 20px;
-  font-size: 32px;
-  font-weight: bold;
-  text-align: center;
-  background-color: #12cbc4;
-  color: #fff;
-  box-sizing: border-box;
-}
-.desc {
-  border: 1px solid #8e959f;
-  padding: 20px;
-  font-size: 18px;
-  width: 100%;
-  background-color: #fff;
-  transition: 0.4s linear all;
-  text-align: center;
-}
-.fade-enter-from {
-  opacity: 0;
-}
-.fade-enter-active {
-  transition: all 0.3s linear;
-}
-.fade-leave-active {
-  transition: all 0.3s linear;
-  opacity: 0;
-  position: absolute;
-}
-.fade-leave-to {
-  opacity: 0;
-} 
-
-.reset-btn {
-  background-color: #ff6372;
-    border: 0;
-    font-size: 22px;
-    color: #fff;
-    padding: 10px 25px;
-    margin: 10px auto;
-    display: block;
-}
-
-.result{ 
-  width: 100%;
-}
-
-
-.reset-btn:active, .reset-btn:focus, .reset-btn:hover{
-  border: 0;
-  outline: 0;
-}
 
 </style>
