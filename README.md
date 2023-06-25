@@ -2,7 +2,7 @@
 
 This template should help get you started developing with Vue 3 in Vite.
 
-Demo - https://harmonious-lokum-1ab6cc.netlify.app/
+Demo - [https://harmonious-lokum-1ab6cc.netlify.app/](https://ferpa-quiz-vue.netlify.app/)
 
 ## Recommended IDE Setup
 
